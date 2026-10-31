@@ -2,8 +2,6 @@ name: Identity receiver source qualification
 
 on:
   pull_request:
-  push:
-    branches: ['codex/firefly-id-session-lifecycle-20261031']
   workflow_dispatch:
 
 permissions:

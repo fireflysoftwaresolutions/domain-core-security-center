@@ -11,8 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.context.ActiveProfiles;
 
 /** Exercises the actual producer generation harness, not the production receiver security chain. */
+@ActiveProfiles("openapi-gen")
 @SpringBootTest(classes = OpenApiGenApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {"spring.config.name=openapi-contract-fixture", "spring.main.web-application-type=reactive",
                 "server.address=127.0.0.1", "springdoc.api-docs.enabled=true", "springdoc.paths-to-match=/api/**"})
