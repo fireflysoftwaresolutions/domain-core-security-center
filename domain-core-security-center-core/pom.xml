@@ -67,6 +67,10 @@
         <!-- Firefly IDP Adapter -->
         <dependency>
             <groupId>org.fireflyframework</groupId>
+            <artifactId>fireflyframework-security-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fireflyframework</groupId>
             <artifactId>fireflyframework-security-idp</artifactId>
         </dependency>
         

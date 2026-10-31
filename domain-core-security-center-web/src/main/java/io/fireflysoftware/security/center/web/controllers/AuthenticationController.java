@@ -23,6 +23,7 @@ import io.fireflysoftware.security.center.core.services.AuthenticationService;
 import io.fireflysoftware.security.center.core.services.AuthenticationService.AuthLogoutRequest;
 import io.fireflysoftware.security.center.core.services.AuthenticationService.AuthenticationResponse;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +45,7 @@ import reactor.core.publisher.Mono;
  *   <li>Client uses tokens for API calls + sessionId for authorization</li>
  * </ol>
  */
+@Hidden
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor

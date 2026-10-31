@@ -21,6 +21,7 @@ import org.fireflyframework.security.idp.dtos.CreateUserRequest;
 import org.fireflyframework.security.idp.dtos.CreateUserResponse;
 import io.fireflysoftware.security.center.core.services.UserService;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,7 @@ import reactor.core.publisher.Mono;
 /**
  * REST controller for user management operations.
  */
+@Hidden
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor

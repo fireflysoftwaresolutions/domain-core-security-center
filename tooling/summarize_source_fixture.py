@@ -1,0 +1,25 @@
+"""Expose counts and bounded redacted errors, never raw Maven/provider logs."""
+import json
+from pathlib import Path
+import re
+import sys
+import xml.etree.ElementTree as ET
+
+ROOT = Path(__file__).resolve().parents[1]
+summary_file = ROOT / '.qualification/source-summary.json'
+summary = json.loads(summary_file.read_text())
+summary['maven_exit'] = int(sys.argv[1])
+summary['reports'] = []
+for path in sorted(ROOT.glob('*/target/surefire-reports/TEST-*.xml')):
+    report = ET.parse(path).getroot()
+    summary['reports'].append({key: report.get(key) for key in ('name', 'tests', 'failures', 'errors', 'skipped')})
+summary_file.write_text(json.dumps(summary, indent=2) + '\n')
+print('Source fixture Maven exit:', summary['maven_exit'])
+print('JUnit report files:', len(summary['reports']))
+errors = [line for line in (ROOT / '.qualification/maven.log').read_text(errors='replace').splitlines()
+          if line.startswith('[ERROR]')]
+for line in errors[-30:]:
+    line = re.sub(r'[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}', '[REDACTED JWT]', line)
+    line = re.sub(r'(?i)((?:password|secret|token)\s*[=:]\s*)[^\s,;]+', r'\1[REDACTED]', line)
+    line = re.sub(r'(https?://[^\s?]+)\?[^\s]+', r'\1?[REDACTED]', line)
+    print(line[:700])
