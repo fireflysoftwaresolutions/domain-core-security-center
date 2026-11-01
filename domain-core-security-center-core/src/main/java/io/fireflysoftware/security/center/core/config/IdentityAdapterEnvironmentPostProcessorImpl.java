@@ -31,7 +31,7 @@ import java.util.Map;
  * properties Jafly and this service already read. Sandbox does not select a
  * Jafly provider, so no identity-provider process starts.
  */
-public class IdentityAdapterEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
+public class IdentityAdapterEnvironmentPostProcessorImpl implements EnvironmentPostProcessor, Ordered {
 
     static final String ADAPTER = "firefly.security-center.identity.adapter";
 

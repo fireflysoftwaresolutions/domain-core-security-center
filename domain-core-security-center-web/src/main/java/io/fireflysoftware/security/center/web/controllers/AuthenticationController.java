@@ -19,10 +19,11 @@ package io.fireflysoftware.security.center.web.controllers;
 import org.fireflyframework.security.idp.dtos.IntrospectionResponse;
 import org.fireflyframework.security.idp.dtos.LoginRequest;
 import org.fireflyframework.security.idp.dtos.RefreshRequest;
-import io.fireflysoftware.security.center.core.services.AuthenticationService;
-import io.fireflysoftware.security.center.core.services.AuthenticationService.AuthLogoutRequest;
-import io.fireflysoftware.security.center.core.services.AuthenticationService.AuthenticationResponse;
+import io.fireflysoftware.security.center.core.services.AuthenticationServiceImpl;
+import io.fireflysoftware.security.center.core.services.AuthenticationServiceImpl.AuthLogoutRequest;
+import io.fireflysoftware.security.center.core.services.AuthenticationServiceImpl.AuthenticationResponse;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,13 +45,14 @@ import reactor.core.publisher.Mono;
  *   <li>Client uses tokens for API calls + sessionId for authorization</li>
  * </ol>
  */
+@Hidden
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticationController {
 
-    private final AuthenticationService authenticationService;
+    private final AuthenticationServiceImpl authenticationService;
 
     /**
      * Login endpoint - authenticates via IDP and creates Firefly session
@@ -64,7 +66,7 @@ public class AuthenticationController {
         
         return authenticationService.login(request)
                 .map(ResponseEntity::ok)
-                .onErrorResume(AuthenticationService.AuthenticationException.class,
+                .onErrorResume(AuthenticationServiceImpl.AuthenticationException.class,
                         error -> Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                                 .build()))
                 .onErrorResume(Exception.class,
@@ -106,7 +108,7 @@ public class AuthenticationController {
         
         return authenticationService.refresh(request)
                 .map(ResponseEntity::ok)
-                .onErrorResume(AuthenticationService.AuthenticationException.class,
+                .onErrorResume(AuthenticationServiceImpl.AuthenticationException.class,
                         error -> Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                                 .build()))
                 .onErrorResume(Exception.class,

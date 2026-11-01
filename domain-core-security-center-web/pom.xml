@@ -38,6 +38,12 @@
             <artifactId>domain-core-security-center-core</artifactId>
         </dependency>
 
+        <!-- Version comes only from the shared parent/BOM release train. -->
+        <dependency>
+            <groupId>org.fireflyframework</groupId>
+            <artifactId>fireflyframework-security-resource-server</artifactId>
+        </dependency>
+
         <!-- Spring Boot Starter WebFlux -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

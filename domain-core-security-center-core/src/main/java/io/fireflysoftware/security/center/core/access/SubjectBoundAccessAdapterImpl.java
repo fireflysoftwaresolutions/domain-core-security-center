@@ -28,16 +28,16 @@ import reactor.core.publisher.Mono;
  * The delegate does not choose the actor. Realm roles on the subject are passed
  * to the sandbox policy when that adapter is the delegate.
  */
-public final class SubjectBoundAccessAdapter implements AccessPort {
+public final class SubjectBoundAccessAdapterImpl implements AccessPort {
 
     private final IdentityPort identityPort;
     private final AccessPort delegate;
-    private final SandboxPolicyAccessAdapter policy;
+    private final SandboxPolicyAccessAdapterImpl policy;
 
-    public SubjectBoundAccessAdapter(IdentityPort identityPort, AccessPort delegate) {
+    public SubjectBoundAccessAdapterImpl(IdentityPort identityPort, AccessPort delegate) {
         this.identityPort = identityPort;
         this.delegate = delegate;
-        this.policy = delegate instanceof SandboxPolicyAccessAdapter sandbox ? sandbox : null;
+        this.policy = delegate instanceof SandboxPolicyAccessAdapterImpl sandbox ? sandbox : null;
     }
 
     @Override

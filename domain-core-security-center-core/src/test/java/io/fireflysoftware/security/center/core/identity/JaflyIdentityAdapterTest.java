@@ -46,7 +46,7 @@ class JaflyIdentityAdapterTest {
                 UserInfoResponse.builder().sub("user-subject").preferredUsername("user").build())));
         when(idpAdapter.getRoles("user-subject")).thenReturn(Mono.just(ResponseEntity.ok(List.of("account-reader"))));
 
-        JaflyIdentityAdapter adapter = new JaflyIdentityAdapter(idpAdapter, IdentityAdapter.KEYCLOAK);
+        JaflyIdentityAdapterImpl adapter = new JaflyIdentityAdapterImpl(idpAdapter, IdentityAdapter.KEYCLOAK);
 
         StepVerifier.create(adapter.authenticate(IdentityRequest.builder().username("user").password("secret").build()))
                 .assertNext(subject -> {
@@ -64,7 +64,7 @@ class JaflyIdentityAdapterTest {
         IdpAdapter idpAdapter = mock(IdpAdapter.class);
         when(idpAdapter.getRoles("actor-1")).thenReturn(Mono.error(new UnsupportedOperationException("getRoles")));
 
-        JaflyIdentityAdapter adapter = new JaflyIdentityAdapter(idpAdapter, IdentityAdapter.COGNITO);
+        JaflyIdentityAdapterImpl adapter = new JaflyIdentityAdapterImpl(idpAdapter, IdentityAdapter.COGNITO);
 
         StepVerifier.create(adapter.resolve("actor-1"))
                 .assertNext(subject -> {

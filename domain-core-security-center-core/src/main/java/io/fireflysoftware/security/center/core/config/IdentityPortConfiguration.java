@@ -16,8 +16,8 @@
 
 package io.fireflysoftware.security.center.core.config;
 
-import io.fireflysoftware.security.center.core.identity.JaflyIdentityAdapter;
-import io.fireflysoftware.security.center.core.identity.SandboxIdentityAdapter;
+import io.fireflysoftware.security.center.core.identity.JaflyIdentityAdapterImpl;
+import io.fireflysoftware.security.center.core.identity.SandboxIdentityAdapterImpl;
 import io.fireflysoftware.security.center.interfaces.identity.IdentityAdapter;
 import io.fireflysoftware.security.center.session.IdentityPort;
 import org.fireflyframework.security.idp.adapter.IdpAdapter;
@@ -43,7 +43,7 @@ public class IdentityPortConfiguration {
             havingValue = "sandbox",
             matchIfMissing = true)
     public IdentityPort sandboxIdentityPort() {
-        return new SandboxIdentityAdapter();
+        return new SandboxIdentityAdapterImpl();
     }
 
     @Bean
@@ -51,6 +51,6 @@ public class IdentityPortConfiguration {
     public IdentityPort jaflyIdentityPort(
             IdpAdapter idpAdapter,
             @Value("${firefly.security-center.identity.adapter}") String adapter) {
-        return new JaflyIdentityAdapter(idpAdapter, IdentityAdapter.fromProperty(adapter));
+        return new JaflyIdentityAdapterImpl(idpAdapter, IdentityAdapter.fromProperty(adapter));
     }
 }

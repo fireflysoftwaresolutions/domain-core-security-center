@@ -41,7 +41,7 @@ import java.util.Map;
  * provider and it does not embed allow or deny rules for particular actors.
  * An installer replaces the policy file, then restarts the service.
  */
-public final class SandboxPolicyAccessAdapter implements AccessPort {
+public final class SandboxPolicyAccessAdapterImpl implements AccessPort {
 
     /**
      * Classpath location of the policy shipped with this service.
@@ -54,7 +54,7 @@ public final class SandboxPolicyAccessAdapter implements AccessPort {
     private final Map<String, List<Grant>> grantsByActor;
     private final Map<String, List<Grant>> grantsByRole;
 
-    public SandboxPolicyAccessAdapter(ResourceLoader resourceLoader, String location) {
+    public SandboxPolicyAccessAdapterImpl(ResourceLoader resourceLoader, String location) {
         LoadedPolicy loaded = load(resourceLoader, location);
         this.grantsByActor = loaded.grantsByActor();
         this.grantsByRole = loaded.grantsByRole();

@@ -68,7 +68,7 @@ class ContractResolverServiceTest {
     private ContractRoleScopeApi contractRoleScopeApi;
 
     @InjectMocks
-    private ContractResolverService contractResolverService;
+    private ContractResolverServiceImpl contractResolverService;
 
     private UUID testPartyId;
     private UUID testContractId;

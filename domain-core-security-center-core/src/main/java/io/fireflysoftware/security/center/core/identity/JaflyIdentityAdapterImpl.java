@@ -37,12 +37,12 @@ import java.util.List;
  * Cognito and the internal database adapter implement the same port.
  * This class does not open its own Keycloak client.
  */
-public final class JaflyIdentityAdapter implements IdentityPort {
+public final class JaflyIdentityAdapterImpl implements IdentityPort {
 
     private final IdpAdapter idpAdapter;
     private final IdentityAdapter adapter;
 
-    public JaflyIdentityAdapter(IdpAdapter idpAdapter, IdentityAdapter adapter) {
+    public JaflyIdentityAdapterImpl(IdpAdapter idpAdapter, IdentityAdapter adapter) {
         this.idpAdapter = idpAdapter;
         this.adapter = adapter;
     }

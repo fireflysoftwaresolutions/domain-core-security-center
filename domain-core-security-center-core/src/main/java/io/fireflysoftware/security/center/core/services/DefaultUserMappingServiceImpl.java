@@ -58,10 +58,10 @@ import java.util.UUID;
  * <p><strong>To auto-provision parties:</strong> Override this service with a custom implementation
  * that creates parties in customer-mgmt when they don't exist.
  */
-@Service
+@Service("defaultUserMappingService")
 @RequiredArgsConstructor
 @Slf4j
-public class DefaultUserMappingService implements UserMappingService {
+public class DefaultUserMappingServiceImpl implements UserMappingService {
 
     private final PartiesApi partiesApi;
     private final EmailContactsApi emailContactsApi;

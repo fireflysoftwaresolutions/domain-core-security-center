@@ -18,8 +18,15 @@ package io.fireflysoftware.security.center.web.controllers;
 
 import io.fireflysoftware.security.center.interfaces.identity.IdentityRequest;
 import io.fireflysoftware.security.center.interfaces.identity.Subject;
-import io.fireflysoftware.security.center.session.IdentityPort;
-import lombok.RequiredArgsConstructor;
+import io.fireflysoftware.security.center.core.authorization.ReceiverAuthorization;
+import io.fireflysoftware.security.center.interfaces.identity.IdentityAdapter;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,33 +35,39 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 /**
- * Resolves who the actor is. The controller calls {@link IdentityPort} and does
- * not talk to Keycloak or any other identity provider.
+ * Projects the independently verified direct self actor without identity-provider lookup.
  */
+@ApiResponses({@ApiResponse(responseCode = "401", description = "Verified bearer identity required"),
+        @ApiResponse(responseCode = "403", description = "Self actor or current policy refused")})
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/v1/identity")
-@RequiredArgsConstructor
 public class IdentityController {
 
-    private final IdentityPort identityPort;
+    private final ReceiverAuthorization authorization;
+    private final IdentityAdapter adapter;
 
-    /**
-     * Authenticates a username, or resolves an actor id, and returns the subject.
-     * Unknown subjects return HTTP 404. A body with neither field returns HTTP 400.
-     */
+    public IdentityController(ReceiverAuthorization authorization, IdentityAdapter adapter) {
+        this.authorization = authorization;
+        this.adapter = adapter;
+    }
+
+    /** Returns only verified self identity; username/password bodies are unsupported. */
+    @ApiResponse(responseCode = "200", description = "Direct self receiver result",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Subject.class)))
     @PostMapping("/subjects")
+    @Operation(operationId = "resolveSubject", summary = "Resolve the independently verified self actor",
+            description = "Requires the direct receiver bearer identity and current policy admission. "
+                    + "An optional actor selector must identify that same actor. Username and password bodies are unsupported.")
     public Mono<ResponseEntity<Subject>> subject(@RequestBody IdentityRequest request) {
-        if (request == null || (isBlank(request.getUsername()) && isBlank(request.getActorId()))) {
+        if (request == null || !isBlank(request.getUsername()) || !isBlank(request.getPassword())) {
             return Mono.just(ResponseEntity.badRequest().build());
         }
-        Mono<Subject> subject = isBlank(request.getUsername())
-                ? identityPort.resolve(request.getActorId())
-                : identityPort.authenticate(request);
-        return subject.map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+        return authorization.authorizeSelf(isBlank(request.getActorId()) ? null : request.getActorId(),
+                        "identity.subject.read", "identity:self", Map.of("operation", "security-center.identity.subject"))
+                .map(actor -> ResponseEntity.ok(Subject.builder().actorId(actor.actorId().toString())
+                        .provider(adapter).roles(actor.principal().authorities().stream().sorted().toList()).build()));
     }
 
-    private static boolean isBlank(String value) {
-        return value == null || value.isBlank();
-    }
+    private static boolean isBlank(String value) { return value == null || value.isBlank(); }
 }

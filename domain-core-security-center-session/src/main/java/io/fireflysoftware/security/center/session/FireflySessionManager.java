@@ -90,36 +90,54 @@ import java.util.UUID;
 public interface FireflySessionManager {
 
     /**
-     * Creates or retrieves a session based on X-Party-Id header.
+     * Explicitly creates a context when no X-Session-Id is supplied, or retrieves
+     * the existing context selected by that header, for the admitted X-Party-Id.
      *
      * <p>This method will:</p>
      * <ol>
      *   <li>Extract partyId from X-Party-Id header</li>
      *   <li>Check cache for existing valid session</li>
-     *   <li>If not cached or expired, aggregate full session context from microservices</li>
+     *   <li>Aggregate only for explicit creation without a selected session ID</li>
      *   <li>Cache the session context</li>
      *   <li>Return the complete session</li>
      * </ol>
      *
+     * <p>The receiving boundary must authorize the party and supply a verified
+     * issuer/tenant namespace. A selected missing, revoked, or expired context
+     * is never recreated. Contexts do not authenticate the caller.</p>
+     *
      * @param exchange The server web exchange containing headers and request information
-     * @return Mono<SessionContextDTO> containing the complete session context
+     * @return the complete context, or empty for a selected unavailable context
      * @throws IllegalArgumentException if X-Party-Id header is missing or invalid
      */
     Mono<SessionContextDTO> createOrGetSession(ServerWebExchange exchange);
 
     /**
+     * Explicitly creates a new ephemeral context in the current verified namespace.
+     * The caller must have independently admitted the party, for example after
+     * successful provider authentication. This does not create an identity-provider
+     * session or grant business authority. Existing custom implementations fail
+     * closed until they implement this separate creation operation.
+     */
+    default Mono<SessionContextDTO> createSession(UUID partyId) {
+        return Mono.error(new UnsupportedOperationException("Explicit session creation is unavailable"));
+    }
+
+    /**
      * Retrieves session by party ID.
      *
-     * <p>This method bypasses ServerWebExchange and directly retrieves/creates
-     * session for the given partyId. Useful for background jobs or internal services.</p>
+     * <p>This method only retrieves a previously created live context in the
+     * current verified issuer/tenant namespace. A cache miss does not aggregate
+     * data or create an authenticated session.</p>
      *
      * @param partyId The party identifier
-     * @return Mono<SessionContextDTO> containing the session context
+     * @return the live context, or empty when unavailable
      */
     Mono<SessionContextDTO> getSessionByPartyId(UUID partyId);
 
     /**
-     * Retrieves session by session ID.
+     * Retrieves a previously created live context by opaque session ID in the
+     * current verified namespace. Missing or revoked contexts are not recreated.
      *
      * @param sessionId The session identifier
      * @return Mono<SessionContextDTO> containing the session context
@@ -129,8 +147,9 @@ public interface FireflySessionManager {
     /**
      * Invalidates a session by session ID.
      *
-     * <p>This will remove the session from cache and mark it as invalidated.
-     * Subsequent requests will need to create a new session.</p>
+     * <p>This revokes the cached application context in the current verified
+     * namespace. A new explicit creation receives a different identifier.
+     * Provider token/session revocation remains a separate operation.</p>
      *
      * @param sessionId The session identifier
      * @return Mono<Void> indicating completion
@@ -138,7 +157,8 @@ public interface FireflySessionManager {
     Mono<Void> invalidateSession(String sessionId);
 
     /**
-     * Invalidates all sessions for a given party ID.
+     * Invalidates all contexts for a party in the current verified namespace,
+     * without clearing other parties' or tenants' cached contexts.
      *
      * <p>Useful for logout scenarios or when party permissions change.</p>
      *
@@ -150,8 +170,9 @@ public interface FireflySessionManager {
     /**
      * Refreshes session with updated data from microservices.
      *
-     * <p>This will evict the cached session and force a fresh aggregation
-     * of all session data.</p>
+     * <p>Only an existing live context is reaggregated. Its identifier, creation
+     * time, and original expiration remain unchanged. A missing or revoked
+     * context cannot be revived by refresh.</p>
      *
      * @param sessionId The session identifier
      * @return Mono<SessionContextDTO> containing the refreshed session

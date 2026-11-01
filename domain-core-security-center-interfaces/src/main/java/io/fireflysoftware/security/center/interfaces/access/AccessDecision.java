@@ -37,6 +37,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AccessDecision {
 
+    /** Current verified caller policy permitted the exact operation and resource. */
+    public static final String CURRENT_POLICY_PERMIT = "CURRENT_POLICY_PERMIT";
+
     /** The sandbox policy granted this actor the action on this resource. */
     public static final String SANDBOX_GRANT = "SANDBOX_GRANT";
 

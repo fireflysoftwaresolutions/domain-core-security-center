@@ -60,7 +60,7 @@ class CustomerResolverServiceTest {
     private PhoneContactsApi phoneContactsApi;
 
     @InjectMocks
-    private CustomerResolverService customerResolverService;
+    private CustomerResolverServiceImpl customerResolverService;
 
     private UUID testPartyId;
     private UUID testTenantId;

@@ -16,9 +16,12 @@
 
 package io.fireflysoftware.security.center.core.config;
 
-import io.fireflysoftware.security.center.core.access.SandboxPolicyAccessAdapter;
-import io.fireflysoftware.security.center.core.access.SessionGrantAccessAdapter;
-import io.fireflysoftware.security.center.core.access.SubjectBoundAccessAdapter;
+import io.fireflysoftware.security.center.core.access.SandboxPolicyAccessAdapterImpl;
+import io.fireflysoftware.security.center.core.authorization.CurrentPolicyAccessAdapter;
+import io.fireflysoftware.security.center.core.authorization.AdmittedAccessRestriction;
+import io.fireflysoftware.security.center.core.authorization.ReceiverAuthorization;
+import io.fireflysoftware.security.center.core.access.SessionGrantAccessAdapterImpl;
+import io.fireflysoftware.security.center.core.access.SubjectBoundAccessAdapterImpl;
 import io.fireflysoftware.security.center.session.AccessPort;
 import io.fireflysoftware.security.center.session.FireflySessionManager;
 import io.fireflysoftware.security.center.session.IdentityPort;
@@ -29,8 +32,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 
 /**
- * Selects the access adapter and binds it to the subject from {@link IdentityPort}.
- * The default delegate reads the sandbox policy file.
+ * Selects current verified-caller policy admission by default.
+ * Explicit legacy adapters remain available only as additional restrictions behind receiver admission.
  * {@code firefly.security-center.access.adapter=session-grants} uses role
  * scopes on the party session instead. Another bean of type {@link AccessPort}
  * can replace either adapter when a deployment calls an entitlement store.
@@ -39,9 +42,16 @@ import org.springframework.core.io.ResourceLoader;
 public class AccessPortConfiguration {
 
     @Bean
+    @ConditionalOnProperty(prefix = "firefly.security-center.access", name = "adapter", havingValue = "current-policy", matchIfMissing = true)
+    public AccessPort currentPolicyAccessPort(ReceiverAuthorization authorization) {
+        return new CurrentPolicyAccessAdapter(authorization);
+    }
+
+    @Bean
     @ConditionalOnProperty(prefix = "firefly.security-center.access", name = "adapter", havingValue = "session-grants")
-    public AccessPort sessionGrantAccessPort(IdentityPort identityPort, FireflySessionManager sessionManager) {
-        return new SubjectBoundAccessAdapter(identityPort, new SessionGrantAccessAdapter(sessionManager));
+    public AccessPort sessionGrantAccessPort(IdentityPort identityPort, FireflySessionManager sessionManager, ReceiverAuthorization authorization) {
+        return new AdmittedAccessRestriction(authorization,
+                new SubjectBoundAccessAdapterImpl(identityPort, new SessionGrantAccessAdapterImpl(sessionManager)));
     }
 
     @Bean
@@ -49,12 +59,13 @@ public class AccessPortConfiguration {
             prefix = "firefly.security-center.access",
             name = "adapter",
             havingValue = "sandbox",
-            matchIfMissing = true)
+            matchIfMissing = false)
     public AccessPort sandboxAccessPort(
             IdentityPort identityPort,
             ResourceLoader resourceLoader,
-            @Value("${firefly.security-center.access.sandbox-policy:" + SandboxPolicyAccessAdapter.DEFAULT_LOCATION + "}")
-            String location) {
-        return new SubjectBoundAccessAdapter(identityPort, new SandboxPolicyAccessAdapter(resourceLoader, location));
+            @Value("${firefly.security-center.access.sandbox-policy:" + SandboxPolicyAccessAdapterImpl.DEFAULT_LOCATION + "}")
+            String location, ReceiverAuthorization authorization) {
+        return new AdmittedAccessRestriction(authorization,
+                new SubjectBoundAccessAdapterImpl(identityPort, new SandboxPolicyAccessAdapterImpl(resourceLoader, location)));
     }
 }

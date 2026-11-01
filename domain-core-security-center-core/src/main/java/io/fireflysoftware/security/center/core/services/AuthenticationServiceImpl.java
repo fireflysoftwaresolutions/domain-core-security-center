@@ -50,9 +50,9 @@ import java.util.UUID;
  * 7. Return tokens + sessionId to client
  * </pre>
  */
-@Service
+@Service("authenticationService")
 @Slf4j
-public class AuthenticationService {
+public class AuthenticationServiceImpl {
 
     private final IdentityPort identityPort;
     private final FireflySessionManager sessionManager;
@@ -61,7 +61,7 @@ public class AuthenticationService {
     @Autowired(required = false)
     private UserMappingService userMappingService;
 
-    public AuthenticationService(
+    public AuthenticationServiceImpl(
             IdentityPort identityPort,
             FireflySessionManager sessionManager,
             ObjectProvider<IdpAdapter> idpAdapters) {
@@ -107,7 +107,7 @@ public class AuthenticationService {
                                         return mapUserToPartyId(userInfo, request.getUsername())
                                                 .flatMap(partyId -> {
                                                     // Create Firefly session
-                                                    return sessionManager.getSessionByPartyId(partyId)
+                                                    return sessionManager.createSession(partyId)
                                                             .map(session -> AuthenticationResponse.builder()
                                                                     .accessToken(tokens.getAccessToken())
                                                                     .refreshToken(tokens.getRefreshToken())
@@ -180,7 +180,7 @@ public class AuthenticationService {
                                         
                                         // Map to partyId and refresh session
                                         return mapUserToPartyId(userInfoResponse.getBody(), UUID.randomUUID().toString())
-                                                .flatMap(partyId -> sessionManager.getSessionByPartyId(partyId)
+                                                .flatMap(partyId -> sessionManager.createSession(partyId)
                                                         .map(session -> AuthenticationResponse.builder()
                                                                 .accessToken(tokens.getAccessToken())
                                                                 .refreshToken(tokens.getRefreshToken())

@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SandboxIdentityAdapterTest {
 
-    private final SandboxIdentityAdapter adapter = new SandboxIdentityAdapter();
+    private final SandboxIdentityAdapterImpl adapter = new SandboxIdentityAdapterImpl();
 
     @Test
     void sampleUsernameResolvesTheSampleActorWithoutAnIdentityProvider() {
@@ -39,7 +39,7 @@ class SandboxIdentityAdapterTest {
     void deniedUsernameResolvesTheSecondActor() {
         StepVerifier.create(adapter.authenticate(IdentityRequest.builder().username("denied-actor").build()))
                 .assertNext(subject -> {
-                    assertThat(subject.getActorId()).isEqualTo(SandboxIdentityAdapter.DENIED_ACTOR_ID);
+                    assertThat(subject.getActorId()).isEqualTo(SandboxIdentityAdapterImpl.DENIED_ACTOR_ID);
                     assertThat(subject.getProvider()).isEqualTo(IdentityAdapter.SANDBOX);
                     assertThat(subject.getRoles()).isEmpty();
                 })
@@ -48,7 +48,7 @@ class SandboxIdentityAdapterTest {
 
     @Test
     void sampleActorIdResolvesTheSameSubject() {
-        StepVerifier.create(adapter.resolve(SandboxIdentityAdapter.SAMPLE_ACTOR_ID.toUpperCase()))
+        StepVerifier.create(adapter.resolve(SandboxIdentityAdapterImpl.SAMPLE_ACTOR_ID.toUpperCase()))
                 .assertNext(this::assertSample)
                 .verifyComplete();
     }
@@ -57,12 +57,12 @@ class SandboxIdentityAdapterTest {
     void sampleEmployeeUsernameReturnsTheEmployeeId() {
         StepVerifier.create(adapter.authenticate(IdentityRequest.builder().username("sample-employee").build()))
                 .assertNext(subject -> {
-                    assertThat(subject.getActorId()).isEqualTo(SandboxIdentityAdapter.EMPLOYEE_ACTOR_ID);
+                    assertThat(subject.getActorId()).isEqualTo(SandboxIdentityAdapterImpl.EMPLOYEE_ACTOR_ID);
                     assertThat(subject.getProvider()).isEqualTo(IdentityAdapter.SANDBOX);
                 })
                 .verifyComplete();
-        StepVerifier.create(adapter.resolve(SandboxIdentityAdapter.EMPLOYEE_ACTOR_ID))
-                .assertNext(subject -> assertThat(subject.getActorId()).isEqualTo(SandboxIdentityAdapter.EMPLOYEE_ACTOR_ID))
+        StepVerifier.create(adapter.resolve(SandboxIdentityAdapterImpl.EMPLOYEE_ACTOR_ID))
+                .assertNext(subject -> assertThat(subject.getActorId()).isEqualTo(SandboxIdentityAdapterImpl.EMPLOYEE_ACTOR_ID))
                 .verifyComplete();
     }
 
@@ -75,7 +75,7 @@ class SandboxIdentityAdapterTest {
     }
 
     private void assertSample(Subject subject) {
-        assertThat(subject.getActorId()).isEqualTo(SandboxIdentityAdapter.SAMPLE_ACTOR_ID);
+        assertThat(subject.getActorId()).isEqualTo(SandboxIdentityAdapterImpl.SAMPLE_ACTOR_ID);
         assertThat(subject.getProvider()).isEqualTo(IdentityAdapter.SANDBOX);
         assertThat(subject.getRoles()).isEmpty();
     }

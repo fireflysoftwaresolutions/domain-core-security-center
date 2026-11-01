@@ -16,68 +16,47 @@
 
 package io.fireflysoftware.security.center.web.controllers;
 
+import org.fireflyframework.security.api.domain.Decision;
 import io.fireflysoftware.security.center.interfaces.identity.IdentityAdapter;
-import io.fireflysoftware.security.center.interfaces.identity.Subject;
-import io.fireflysoftware.security.center.session.IdentityPort;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 class IdentityControllerTest {
-
     @Test
-    void returnsTheSubjectFromThePort() {
-        IdentityPort port = mock(IdentityPort.class);
-        when(port.authenticate(any())).thenReturn(Mono.just(Subject.builder()
-                .actorId("11111111-1111-4111-8111-111111111111")
-                .provider(IdentityAdapter.SANDBOX)
-                .roles(List.of())
-                .build()));
-
-        WebTestClient.bindToController(new IdentityController(port)).build()
-                .post()
-                .uri("/api/v1/identity/subjects")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\"username\":\"sample-journey\"}")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.actorId").isEqualTo("11111111-1111-4111-8111-111111111111")
-                .jsonPath("$.provider").isEqualTo("sandbox")
-                .jsonPath("$.roles").isEmpty();
+    void signedSelfIsProjectedWithoutAnyUsernameOrIdpLookup() {
+        WebTestClient.bindToController(new IdentityController(ReceiverTestActors.permitted(), IdentityAdapter.KEYCLOAK)).build()
+                .post().uri("/api/v1/identity/subjects").contentType(MediaType.APPLICATION_JSON).bodyValue("{}")
+                .exchange().expectStatus().isOk().expectBody()
+                .jsonPath("$.actorId").isEqualTo(ReceiverTestActors.ACTOR)
+                .jsonPath("$.provider").isEqualTo("keycloak")
+                .jsonPath("$.roles[0]").isEqualTo("signed-profile-reader")
+                .jsonPath("$.accessToken").doesNotExist();
     }
 
     @Test
-    void unknownSubjectIsNotFound() {
-        IdentityPort port = mock(IdentityPort.class);
-        when(port.authenticate(any())).thenReturn(Mono.empty());
-
-        WebTestClient.bindToController(new IdentityController(port)).build()
-                .post()
-                .uri("/api/v1/identity/subjects")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\"username\":\"someone-else\"}")
-                .exchange()
-                .expectStatus().isNotFound();
+    void usernameOnlyOrPasswordRequestsAreNotAuthentication() {
+        var client = WebTestClient.bindToController(new IdentityController(ReceiverTestActors.permitted(), IdentityAdapter.KEYCLOAK)).build();
+        for (String request : new String[]{"{\"username\":\"known-admin\"}", "{\"password\":\"private-secret\"}"}) {
+            client.post().uri("/api/v1/identity/subjects").contentType(MediaType.APPLICATION_JSON).bodyValue(request)
+                    .exchange().expectStatus().isBadRequest();
+        }
     }
 
     @Test
-    void missingUsernameAndActorIdIsBadRequest() {
-        IdentityPort port = mock(IdentityPort.class);
-
-        WebTestClient.bindToController(new IdentityController(port)).build()
-                .post()
-                .uri("/api/v1/identity/subjects")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{}")
-                .exchange()
-                .expectStatus().isBadRequest();
+    void absentPrincipalWrongActorAndCurrentPolicyRefusalCannotReturnAnIdentity() {
+        var absent = ReceiverTestActors.guard(Mono.empty(), (p, a, r, c) -> Mono.just(Decision.permit()));
+        WebTestClient.bindToController(new IdentityController(absent, IdentityAdapter.KEYCLOAK)).build()
+                .post().uri("/api/v1/identity/subjects").contentType(MediaType.APPLICATION_JSON).bodyValue("{}")
+                .exchange().expectStatus().isUnauthorized();
+        var client = WebTestClient.bindToController(new IdentityController(ReceiverTestActors.permitted(), IdentityAdapter.KEYCLOAK)).build();
+        client.post().uri("/api/v1/identity/subjects").contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\"actorId\":\"22222222-2222-4222-8222-222222222222\"}")
+                .exchange().expectStatus().isForbidden();
+        var denied = ReceiverTestActors.guard(Mono.just(ReceiverTestActors.human()), (p, a, r, c) -> Mono.just(Decision.deny("denied")));
+        WebTestClient.bindToController(new IdentityController(denied, IdentityAdapter.KEYCLOAK)).build()
+                .post().uri("/api/v1/identity/subjects").contentType(MediaType.APPLICATION_JSON).bodyValue("{}")
+                .exchange().expectStatus().isForbidden();
     }
 }

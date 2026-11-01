@@ -44,6 +44,16 @@ firefly:
   # copies firefly.security-center.identity.adapter onto that property when it is
   # keycloak, cognito, or internal-db. sandbox starts no identity-provider process.
   security:
+    resource-server:
+      enabled: true
+      issuer: ${SECURITY_CENTER_TRUSTED_ISSUER}
+      jwk-set-uri: ${SECURITY_CENTER_TRUSTED_JWKS_URI}
+      audiences:
+        - ${SECURITY_CENTER_AUDIENCE}
+      tenant-claim-paths: [tenant_id]
+      tenant-required: true
+      strict-policy: true
+      signature-algorithms: [RS256]
     idp:
       provider: ${FIREFLY_IDENTITY_ADAPTER:sandbox}
   # Framework-level IDP properties (required by fireflyframework-idp-aws-cognito auto-configuration)
@@ -81,6 +91,12 @@ firefly:
       password: ${REDIS_PASSWORD:}
 
   security-center:
+    receiver:
+      issuer: ${SECURITY_CENTER_TRUSTED_ISSUER}
+      audience: ${SECURITY_CENTER_AUDIENCE}
+      population: ${SECURITY_CENTER_POPULATION}
+      allowed-clients: ${SECURITY_CENTER_ALLOWED_CLIENTS}
+      transport-profile: ${SECURITY_CENTER_RECEIVER_TRANSPORT_PROFILE:https}
     # sandbox | keycloak | cognito | internal-db
     # keycloak uses org.fireflyframework:fireflyframework-security-idp-keycloak
     identity:
@@ -109,10 +125,9 @@ firefly:
       timeout-minutes: 30
       cleanup-interval-minutes: 15
 
-    # Access decisions do not call an identity provider.
-    # sandbox reads the policy file. session-grants evaluates role scopes on the party session.
+    # Verified caller/current policy is authoritative; legacy adapters are explicit restrictions only.
     access:
-      adapter: sandbox
+      adapter: current-policy
       sandbox-policy: classpath:access/sandbox-access-policy.json
 
     # Downstream microservice SDK clients
@@ -137,8 +152,8 @@ management:
         include: health,info,metrics,prometheus
   endpoint:
     health:
-      show-details: always
-      show-components: always
+      show-details: never
+      show-components: never
   health:
     defaults:
       enabled: true
@@ -153,4 +168,4 @@ logging:
   level:
     root: INFO
     io.fireflysoftware: DEBUG
-    org.springframework.web: DEBUG
+    org.springframework.web: INFO
