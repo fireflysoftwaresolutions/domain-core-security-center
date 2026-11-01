@@ -48,10 +48,10 @@ import java.util.UUID;
  * <p>Uses OpenAPI-generated SDK clients to fetch contract, role, and product information
  * from downstream microservices and maps them to Security Center DTOs.
  */
-@Service
+@Service("contractResolverService")
 @RequiredArgsConstructor
 @Slf4j
-public class ContractResolverService {
+public class ContractResolverServiceImpl {
 
     private final ContractsApi contractsApi;
     private final ContractPartiesApi contractPartiesApi;

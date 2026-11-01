@@ -16,7 +16,7 @@
 
 package io.fireflysoftware.security.center.core.impl;
 
-import io.fireflysoftware.security.center.core.services.SessionAggregationService;
+import io.fireflysoftware.security.center.core.services.SessionAggregationServiceImpl;
 import io.fireflysoftware.security.center.interfaces.dtos.ContractInfoDTO;
 import io.fireflysoftware.security.center.interfaces.dtos.SessionContextDTO;
 import io.fireflysoftware.security.center.interfaces.dtos.SessionMetadataDTO;
@@ -47,23 +47,23 @@ public class FireflySessionManagerImpl implements FireflySessionManager {
 
     private static final Duration SESSION_TTL = Duration.ofMinutes(30);
     private static final Duration GENERATION_TTL = Duration.ofHours(1);
-    private final SessionAggregationService sessionAggregationService;
+    private final SessionAggregationServiceImpl sessionAggregationService;
     private final FireflyCacheManager cacheManager;
     private final SecurityContextPort contexts;
     private final Clock clock;
 
     @Autowired
-    public FireflySessionManagerImpl(SessionAggregationService sessionAggregationService,
+    public FireflySessionManagerImpl(SessionAggregationServiceImpl sessionAggregationService,
             @Qualifier("sessionCacheManager") FireflyCacheManager cacheManager, SecurityContextPort contexts) {
         this(sessionAggregationService, cacheManager, contexts, Clock.systemUTC());
     }
 
     /** Preserves constructor linkage without introducing an unscoped trusted mode. */
-    public FireflySessionManagerImpl(SessionAggregationService sessionAggregationService, FireflyCacheManager cacheManager) {
+    public FireflySessionManagerImpl(SessionAggregationServiceImpl sessionAggregationService, FireflyCacheManager cacheManager) {
         this(sessionAggregationService, cacheManager, Mono::empty, Clock.systemUTC());
     }
 
-    FireflySessionManagerImpl(SessionAggregationService sessionAggregationService, FireflyCacheManager cacheManager,
+    FireflySessionManagerImpl(SessionAggregationServiceImpl sessionAggregationService, FireflyCacheManager cacheManager,
             SecurityContextPort contexts, Clock clock) {
         this.sessionAggregationService = Objects.requireNonNull(sessionAggregationService);
         this.cacheManager = Objects.requireNonNull(cacheManager);

@@ -50,9 +50,9 @@ import java.util.UUID;
  * 7. Return tokens + sessionId to client
  * </pre>
  */
-@Service
+@Service("authenticationService")
 @Slf4j
-public class AuthenticationService {
+public class AuthenticationServiceImpl {
 
     private final IdentityPort identityPort;
     private final FireflySessionManager sessionManager;
@@ -61,7 +61,7 @@ public class AuthenticationService {
     @Autowired(required = false)
     private UserMappingService userMappingService;
 
-    public AuthenticationService(
+    public AuthenticationServiceImpl(
             IdentityPort identityPort,
             FireflySessionManager sessionManager,
             ObjectProvider<IdpAdapter> idpAdapters) {

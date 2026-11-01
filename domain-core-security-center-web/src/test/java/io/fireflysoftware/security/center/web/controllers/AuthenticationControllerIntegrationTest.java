@@ -18,7 +18,7 @@ package io.fireflysoftware.security.center.web.controllers;
 
 import org.fireflyframework.security.idp.dtos.LoginRequest;
 import org.fireflyframework.security.idp.dtos.RefreshRequest;
-import io.fireflysoftware.security.center.core.services.AuthenticationService;
+import io.fireflysoftware.security.center.core.services.AuthenticationServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
 class AuthenticationControllerIntegrationTest {
 
     @Mock
-    private AuthenticationService authenticationService;
+    private AuthenticationServiceImpl authenticationService;
 
     @InjectMocks
     private AuthenticationController controller;
@@ -70,7 +70,7 @@ class AuthenticationControllerIntegrationTest {
                 .password("test_password")
                 .build();
 
-        AuthenticationService.AuthenticationResponse mockResponse = AuthenticationService.AuthenticationResponse.builder()
+        AuthenticationServiceImpl.AuthenticationResponse mockResponse = AuthenticationServiceImpl.AuthenticationResponse.builder()
                 .accessToken("mock_access_token")
                 .refreshToken("mock_refresh_token")
                 .idToken("mock_id_token")
@@ -84,7 +84,7 @@ class AuthenticationControllerIntegrationTest {
                 .thenReturn(Mono.just(mockResponse));
 
         // Act
-        Mono<ResponseEntity<AuthenticationService.AuthenticationResponse>> result = controller.login(request);
+        Mono<ResponseEntity<AuthenticationServiceImpl.AuthenticationResponse>> result = controller.login(request);
 
         // Assert
         StepVerifier.create(result)
@@ -108,10 +108,10 @@ class AuthenticationControllerIntegrationTest {
                 .build();
 
         when(authenticationService.login(any(LoginRequest.class)))
-                .thenReturn(Mono.error(new AuthenticationService.AuthenticationException("Invalid credentials")));
+                .thenReturn(Mono.error(new AuthenticationServiceImpl.AuthenticationException("Invalid credentials")));
 
         // Act
-        Mono<ResponseEntity<AuthenticationService.AuthenticationResponse>> result = controller.login(request);
+        Mono<ResponseEntity<AuthenticationServiceImpl.AuthenticationResponse>> result = controller.login(request);
 
         // Assert  - Controller handles error and returns 401 response
         StepVerifier.create(result)
@@ -124,13 +124,13 @@ class AuthenticationControllerIntegrationTest {
     @Test
     void testLogoutSuccess() {
         // Arrange
-        AuthenticationService.AuthLogoutRequest request = AuthenticationService.AuthLogoutRequest.builder()
+        AuthenticationServiceImpl.AuthLogoutRequest request = AuthenticationServiceImpl.AuthLogoutRequest.builder()
                 .accessToken("mock_access_token")
                 .refreshToken("mock_refresh_token")
                 .sessionId("session_123")
                 .build();
 
-        when(authenticationService.logout(any(AuthenticationService.AuthLogoutRequest.class)))
+        when(authenticationService.logout(any(AuthenticationServiceImpl.AuthLogoutRequest.class)))
                 .thenReturn(Mono.empty());
 
         // Act
@@ -151,7 +151,7 @@ class AuthenticationControllerIntegrationTest {
                 .refreshToken("mock_refresh_token")
                 .build();
 
-        AuthenticationService.AuthenticationResponse mockResponse = AuthenticationService.AuthenticationResponse.builder()
+        AuthenticationServiceImpl.AuthenticationResponse mockResponse = AuthenticationServiceImpl.AuthenticationResponse.builder()
                 .accessToken("new_access_token")
                 .refreshToken("new_refresh_token")
                 .idToken("new_id_token")
@@ -165,7 +165,7 @@ class AuthenticationControllerIntegrationTest {
                 .thenReturn(Mono.just(mockResponse));
 
         // Act
-        Mono<ResponseEntity<AuthenticationService.AuthenticationResponse>> result = controller.refresh(request);
+        Mono<ResponseEntity<AuthenticationServiceImpl.AuthenticationResponse>> result = controller.refresh(request);
 
         // Assert
         StepVerifier.create(result)

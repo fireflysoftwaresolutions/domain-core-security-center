@@ -1,8 +1,8 @@
 /* Copyright 2026 Firefly Software Foundation. Licensed under the Apache License, Version 2.0. */
 package io.fireflysoftware.security.center.core.impl;
 
-import io.fireflysoftware.security.center.core.services.SessionAggregationService;
-import io.fireflysoftware.security.center.core.services.AuthenticationService;
+import io.fireflysoftware.security.center.core.services.SessionAggregationServiceImpl;
+import io.fireflysoftware.security.center.core.services.AuthenticationServiceImpl;
 import io.fireflysoftware.security.center.core.services.UserMappingService;
 import io.fireflysoftware.security.center.interfaces.dtos.SessionContextDTO;
 import io.fireflysoftware.security.center.session.IdentityPort;
@@ -361,7 +361,7 @@ class FireflySessionManagerImplTest {
         final MutableClock clock = new MutableClock();
         final TestCache cache = new TestCache(clock);
         final AtomicInteger aggregations = new AtomicInteger();
-        final SessionAggregationService aggregation = mock(SessionAggregationService.class);
+        final SessionAggregationServiceImpl aggregation = mock(SessionAggregationServiceImpl.class);
         final SecurityContextPort contexts = () -> Mono.deferContextual(context -> Mono.justOrEmpty(context.<SecurityPrincipal>getOrEmpty(PRINCIPAL)));
         final SecurityPrincipal actorA = principal("https://issuer.example/realms/workforce", " tenant, /α ");
         final FireflySessionManagerImpl manager = new FireflySessionManagerImpl(aggregation, new FireflyCacheManager(cache), contexts, clock);
@@ -391,7 +391,7 @@ class FireflySessionManagerImplTest {
         }
 
         @SuppressWarnings("unchecked")
-        AuthenticationService authenticationService() {
+        AuthenticationServiceImpl authenticationService() {
             var idp = mock(IdpAdapter.class);
             var provider = (ObjectProvider<IdpAdapter>) mock(ObjectProvider.class);
             when(provider.getIfAvailable()).thenReturn(idp);
@@ -402,7 +402,7 @@ class FireflySessionManagerImplTest {
                     UserInfoResponse.builder().sub("provider-subject").preferredUsername("fixture-user").build())));
             var mapping = mock(UserMappingService.class);
             when(mapping.mapToPartyId(any(), any())).thenReturn(Mono.just(PARTY_A));
-            var service = new AuthenticationService(mock(IdentityPort.class), manager, provider);
+            var service = new AuthenticationServiceImpl(mock(IdentityPort.class), manager, provider);
             ReflectionTestUtils.setField(service, "userMappingService", mapping);
             return service;
         }

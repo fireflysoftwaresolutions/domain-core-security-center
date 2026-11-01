@@ -18,7 +18,7 @@ package io.fireflysoftware.security.center.web.config;
 
 import io.fireflysoftware.core.customer.sdk.api.EmailContactsApi;
 import io.fireflysoftware.core.customer.sdk.api.PartiesApi;
-import io.fireflysoftware.security.center.core.services.DefaultUserMappingService;
+import io.fireflysoftware.security.center.core.services.DefaultUserMappingServiceImpl;
 import io.fireflysoftware.security.center.core.services.UserMappingService;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -40,7 +40,7 @@ public class SecurityCenterTestConfiguration {
     @Bean
     @Primary
     public UserMappingService userMappingService(PartiesApi partiesApi, EmailContactsApi emailContactsApi) {
-        return new DefaultUserMappingService(partiesApi, emailContactsApi);
+        return new DefaultUserMappingServiceImpl(partiesApi, emailContactsApi);
     }
 }
 

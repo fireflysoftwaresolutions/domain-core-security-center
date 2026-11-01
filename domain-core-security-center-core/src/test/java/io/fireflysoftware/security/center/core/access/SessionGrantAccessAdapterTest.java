@@ -119,7 +119,7 @@ class SessionGrantAccessAdapterTest {
 
     @Test
     void nonUuidActorDoesNotAskForASession() {
-        SessionGrantAccessAdapter adapter = new SessionGrantAccessAdapter(sessionManager);
+        SessionGrantAccessAdapterImpl adapter = new SessionGrantAccessAdapterImpl(sessionManager);
 
         StepVerifier.create(adapter.decide(request("not-a-party", AccessAction.READ, AccessResourceType.PARTY, "party-1")))
                 .assertNext(decision -> {
@@ -132,7 +132,7 @@ class SessionGrantAccessAdapterTest {
     }
 
     private void assertDecision(AccessRequest request, boolean allowed, String reasonCode) {
-        SessionGrantAccessAdapter adapter = new SessionGrantAccessAdapter(sessionManager);
+        SessionGrantAccessAdapterImpl adapter = new SessionGrantAccessAdapterImpl(sessionManager);
         StepVerifier.create(adapter.decide(request))
                 .assertNext(decision -> {
                     assertThat(decision.isAllowed()).isEqualTo(allowed);

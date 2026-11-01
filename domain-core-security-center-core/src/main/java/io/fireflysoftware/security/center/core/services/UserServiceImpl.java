@@ -29,13 +29,13 @@ import reactor.core.publisher.Mono;
 /**
  * Service that delegates user creation to the configured {@link IdpAdapter} and preserves its HTTP status.
  */
-@Service
+@Service("userService")
 @Slf4j
-public class UserService {
+public class UserServiceImpl {
 
     private final IdpAdapter idpAdapter;
 
-    public UserService(ObjectProvider<IdpAdapter> idpAdapters) {
+    public UserServiceImpl(ObjectProvider<IdpAdapter> idpAdapters) {
         this.idpAdapter = idpAdapters.getIfAvailable();
     }
 

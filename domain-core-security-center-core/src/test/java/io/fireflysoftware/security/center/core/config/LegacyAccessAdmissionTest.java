@@ -7,7 +7,7 @@
  */
 package io.fireflysoftware.security.center.core.config;
 
-import io.fireflysoftware.security.center.core.access.SandboxPolicyAccessAdapter;
+import io.fireflysoftware.security.center.core.access.SandboxPolicyAccessAdapterImpl;
 import io.fireflysoftware.security.center.core.authorization.ReceiverAuthorization;
 import io.fireflysoftware.security.center.interfaces.access.AccessAction;
 import io.fireflysoftware.security.center.interfaces.access.AccessRequest;
@@ -53,7 +53,7 @@ class LegacyAccessAdmissionTest {
                         ISSUER, "security-center", "HUMAN", List.of("test-direct-client"));
                 var config = new AccessPortConfiguration();
                 AccessPort port = selection.equals("sandbox")
-                        ? config.sandboxAccessPort(identity, new DefaultResourceLoader(), SandboxPolicyAccessAdapter.DEFAULT_LOCATION, authorization)
+                        ? config.sandboxAccessPort(identity, new DefaultResourceLoader(), SandboxPolicyAccessAdapterImpl.DEFAULT_LOCATION, authorization)
                         : config.sessionGrantAccessPort(identity, sessions, authorization);
                 StepVerifier.create(port.decide(AccessRequest.builder().actorId(ACTOR).action(AccessAction.READ)
                                 .resourceType(AccessResourceType.ACCOUNT).resourceId("account-one").build()))
@@ -81,7 +81,7 @@ class LegacyAccessAdmissionTest {
                     ISSUER, "security-center", "HUMAN", List.of("test-direct-client"));
             var config = new AccessPortConfiguration();
             AccessPort port = selection.equals("sandbox")
-                    ? config.sandboxAccessPort(identity, new DefaultResourceLoader(), SandboxPolicyAccessAdapter.DEFAULT_LOCATION, authorization)
+                    ? config.sandboxAccessPort(identity, new DefaultResourceLoader(), SandboxPolicyAccessAdapterImpl.DEFAULT_LOCATION, authorization)
                     : config.sessionGrantAccessPort(identity, sessions, authorization);
             StepVerifier.create(port.decide(AccessRequest.builder().actorId(ACTOR).action(AccessAction.READ)
                             .resourceType(AccessResourceType.ACCOUNT).resourceId("account-one").build()))

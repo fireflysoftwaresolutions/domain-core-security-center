@@ -16,7 +16,7 @@
 
 package io.fireflysoftware.security.center.core.access;
 
-import io.fireflysoftware.security.center.core.identity.SandboxIdentityAdapter;
+import io.fireflysoftware.security.center.core.identity.SandboxIdentityAdapterImpl;
 import io.fireflysoftware.security.center.interfaces.identity.IdentityAdapter;
 import io.fireflysoftware.security.center.interfaces.access.AccessAction;
 import io.fireflysoftware.security.center.interfaces.access.AccessDecision;
@@ -40,18 +40,18 @@ class SubjectBoundAccessAdapterTest {
 
     @Test
     void usesTheSandboxSubjectAndAllowsOnlyTheSampleActor() {
-        SandboxPolicyAccessAdapter policy = new SandboxPolicyAccessAdapter(
-                new DefaultResourceLoader(), SandboxPolicyAccessAdapter.DEFAULT_LOCATION);
-        SubjectBoundAccessAdapter access = new SubjectBoundAccessAdapter(new SandboxIdentityAdapter(), policy);
+        SandboxPolicyAccessAdapterImpl policy = new SandboxPolicyAccessAdapterImpl(
+                new DefaultResourceLoader(), SandboxPolicyAccessAdapterImpl.DEFAULT_LOCATION);
+        SubjectBoundAccessAdapterImpl access = new SubjectBoundAccessAdapterImpl(new SandboxIdentityAdapterImpl(), policy);
 
-        assertDecision(access, SandboxIdentityAdapter.SAMPLE_ACTOR_ID, AccessAction.READ, true, AccessDecision.SANDBOX_GRANT);
-        assertDecision(access, SandboxIdentityAdapter.SAMPLE_ACTOR_ID, AccessAction.CREATE, true, AccessDecision.SANDBOX_GRANT);
-        assertDecision(access, SandboxIdentityAdapter.DENIED_ACTOR_ID, AccessAction.READ, false, AccessDecision.ACTOR_NOT_ENTITLED);
-        assertDecision(access, SandboxIdentityAdapter.SAMPLE_ACTOR_ID, AccessAction.ADMINISTER, false, AccessDecision.ACTION_NOT_GRANTED);
-        assertDecision(access, SandboxIdentityAdapter.SAMPLE_ACTOR_ID, AccessAction.IMPERSONATE, false, AccessDecision.ACTION_NOT_GRANTED);
-        assertDecision(access, SandboxIdentityAdapter.EMPLOYEE_ACTOR_ID, AccessAction.READ, true, AccessDecision.SANDBOX_GRANT);
-        assertDecision(access, SandboxIdentityAdapter.EMPLOYEE_ACTOR_ID, AccessAction.ADMINISTER, true, AccessDecision.SANDBOX_GRANT);
-        assertDecision(access, SandboxIdentityAdapter.EMPLOYEE_ACTOR_ID, AccessAction.IMPERSONATE, true, AccessDecision.SANDBOX_GRANT);
+        assertDecision(access, SandboxIdentityAdapterImpl.SAMPLE_ACTOR_ID, AccessAction.READ, true, AccessDecision.SANDBOX_GRANT);
+        assertDecision(access, SandboxIdentityAdapterImpl.SAMPLE_ACTOR_ID, AccessAction.CREATE, true, AccessDecision.SANDBOX_GRANT);
+        assertDecision(access, SandboxIdentityAdapterImpl.DENIED_ACTOR_ID, AccessAction.READ, false, AccessDecision.ACTOR_NOT_ENTITLED);
+        assertDecision(access, SandboxIdentityAdapterImpl.SAMPLE_ACTOR_ID, AccessAction.ADMINISTER, false, AccessDecision.ACTION_NOT_GRANTED);
+        assertDecision(access, SandboxIdentityAdapterImpl.SAMPLE_ACTOR_ID, AccessAction.IMPERSONATE, false, AccessDecision.ACTION_NOT_GRANTED);
+        assertDecision(access, SandboxIdentityAdapterImpl.EMPLOYEE_ACTOR_ID, AccessAction.READ, true, AccessDecision.SANDBOX_GRANT);
+        assertDecision(access, SandboxIdentityAdapterImpl.EMPLOYEE_ACTOR_ID, AccessAction.ADMINISTER, true, AccessDecision.SANDBOX_GRANT);
+        assertDecision(access, SandboxIdentityAdapterImpl.EMPLOYEE_ACTOR_ID, AccessAction.IMPERSONATE, true, AccessDecision.SANDBOX_GRANT);
         assertDecision(access, "44444444-4444-4444-8444-444444444444", AccessAction.READ, false, AccessDecision.ACTOR_UNKNOWN);
     }
 
@@ -71,7 +71,7 @@ class SubjectBoundAccessAdapterTest {
                   ]
                 }
                 """);
-        SandboxPolicyAccessAdapter policy = new SandboxPolicyAccessAdapter(new DefaultResourceLoader(), file.toUri().toString());
+        SandboxPolicyAccessAdapterImpl policy = new SandboxPolicyAccessAdapterImpl(new DefaultResourceLoader(), file.toUri().toString());
         IdentityPort identity = new IdentityPort() {
             @Override
             public Mono<Subject> authenticate(IdentityRequest request) {
@@ -87,14 +87,14 @@ class SubjectBoundAccessAdapterTest {
                         .build());
             }
         };
-        SubjectBoundAccessAdapter access = new SubjectBoundAccessAdapter(identity, policy);
+        SubjectBoundAccessAdapterImpl access = new SubjectBoundAccessAdapterImpl(identity, policy);
 
         assertDecision(access, "keycloak-user", AccessAction.READ, true, AccessDecision.REALM_ROLE_GRANT);
         assertDecision(access, "keycloak-user", AccessAction.CREATE, false, AccessDecision.ACTOR_UNKNOWN);
     }
 
     private static void assertDecision(
-            SubjectBoundAccessAdapter access,
+            SubjectBoundAccessAdapterImpl access,
             String actorId,
             AccessAction action,
             boolean allowed,
