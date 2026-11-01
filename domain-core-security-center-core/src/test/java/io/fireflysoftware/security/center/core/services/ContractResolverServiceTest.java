@@ -46,7 +46,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for ContractResolverService.
+ * Unit tests for ContractResolverServiceImpl.
  * Tests contract resolution and enrichment with mocked SDK APIs.
  */
 @ExtendWith(MockitoExtension.class)
@@ -68,7 +68,7 @@ class ContractResolverServiceTest {
     private ContractRoleScopeApi contractRoleScopeApi;
 
     @InjectMocks
-    private ContractResolverService contractResolverService;
+    private ContractResolverServiceImpl contractResolverService;
 
     private UUID testPartyId;
     private UUID testContractId;

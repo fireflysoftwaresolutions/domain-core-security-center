@@ -50,9 +50,9 @@ import java.util.UUID;
  * 7. Return tokens + sessionId to client
  * </pre>
  */
-@Service
+@Service("authenticationService")
 @Slf4j
-public class AuthenticationService {
+public class AuthenticationServiceImpl {
 
     private final IdentityPort identityPort;
     private final FireflySessionManager sessionManager;
@@ -61,7 +61,7 @@ public class AuthenticationService {
     @Autowired(required = false)
     private UserMappingService userMappingService;
 
-    public AuthenticationService(
+    public AuthenticationServiceImpl(
             IdentityPort identityPort,
             FireflySessionManager sessionManager,
             ObjectProvider<IdpAdapter> idpAdapters) {
@@ -232,7 +232,7 @@ public class AuthenticationService {
      * <p>This delegates to {@link UserMappingService} which queries customer-mgmt
      * to find the partyId associated with the IDP user.
      *
-     * <p><strong>Mapping Strategies (via DefaultUserMappingService):</strong></p>
+     * <p><strong>Mapping Strategies (via DefaultUserMappingServiceImpl):</strong></p>
      * <ol>
      *   <li>Email-based mapping: Searches all parties' email contacts</li>
      *   <li>Username-based mapping: Searches parties by sourceSystem field</li>
@@ -242,7 +242,7 @@ public class AuthenticationService {
      * <p><strong>Important:</strong> Parties must exist in customer-mgmt before users can authenticate.
      * If a party is not found, authentication will fail with an error.
      *
-     * <p><strong>Customization:</strong> Provide your own {@code @Service} implementation
+     * <p><strong>Customization:</strong> Provide your own {@code @Service("authenticationService")} implementation
      * of {@link UserMappingService} to override the default behavior (e.g., auto-provision parties).
      *
      * @param userInfo IDP user information from /userinfo endpoint
@@ -252,7 +252,7 @@ public class AuthenticationService {
      */
     private Mono<UUID> mapUserToPartyId(UserInfoResponse userInfo, String username) {
         if (userMappingService == null) {
-            log.error("❌ No UserMappingService configured! This should not happen - DefaultUserMappingService should be auto-configured.");
+            log.error("❌ No UserMappingService configured! This should not happen - DefaultUserMappingServiceImpl should be auto-configured.");
             log.error("❌ Check Spring configuration and ensure customer-mgmt SDK beans are available.");
             return Mono.error(new IllegalStateException(
                     "No UserMappingService configured. Cannot map IDP user to partyId."));

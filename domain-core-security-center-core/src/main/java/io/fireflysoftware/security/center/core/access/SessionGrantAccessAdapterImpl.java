@@ -37,13 +37,13 @@ import java.util.UUID;
  * A scope without {@code resourceId} covers every resource of that type.
  * A scope {@code resourceId} of {@code *} does the same.
  */
-public final class SessionGrantAccessAdapter implements AccessPort {
+public final class SessionGrantAccessAdapterImpl implements AccessPort {
 
     private static final String ANY_RESOURCE = "*";
 
     private final FireflySessionManager sessionManager;
 
-    public SessionGrantAccessAdapter(FireflySessionManager sessionManager) {
+    public SessionGrantAccessAdapterImpl(FireflySessionManager sessionManager) {
         this.sessionManager = sessionManager;
     }
 

@@ -38,7 +38,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for CustomerResolverService.
+ * Unit tests for CustomerResolverServiceImpl.
  * Tests all enrichment scenarios with mocked SDK APIs.
  */
 @ExtendWith(MockitoExtension.class)
@@ -60,7 +60,7 @@ class CustomerResolverServiceTest {
     private PhoneContactsApi phoneContactsApi;
 
     @InjectMocks
-    private CustomerResolverService customerResolverService;
+    private CustomerResolverServiceImpl customerResolverService;
 
     private UUID testPartyId;
     private UUID testTenantId;

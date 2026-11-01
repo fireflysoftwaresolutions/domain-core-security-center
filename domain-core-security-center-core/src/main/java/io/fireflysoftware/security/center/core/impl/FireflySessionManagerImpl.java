@@ -17,7 +17,7 @@
 package io.fireflysoftware.security.center.core.impl;
 
 import org.fireflyframework.cache.manager.FireflyCacheManager;
-import io.fireflysoftware.security.center.core.services.SessionAggregationService;
+import io.fireflysoftware.security.center.core.services.SessionAggregationServiceImpl;
 import io.fireflysoftware.security.center.interfaces.dtos.SessionContextDTO;
 import io.fireflysoftware.security.center.interfaces.dtos.SessionMetadataDTO;
 import io.fireflysoftware.security.center.session.FireflySessionManager;
@@ -46,7 +46,7 @@ public class FireflySessionManagerImpl implements FireflySessionManager {
     private static final String SESSION_CACHE_PREFIX = "session:";
     private static final int DEFAULT_SESSION_TIMEOUT_MINUTES = 30;
 
-    private final SessionAggregationService sessionAggregationService;
+    private final SessionAggregationServiceImpl sessionAggregationService;
     private final FireflyCacheManager cacheManager;
 
     /**
@@ -56,7 +56,7 @@ public class FireflySessionManagerImpl implements FireflySessionManager {
      * @param cacheManager dedicated session cache manager (qualified bean)
      */
     public FireflySessionManagerImpl(
-            SessionAggregationService sessionAggregationService,
+            SessionAggregationServiceImpl sessionAggregationService,
             @Qualifier("sessionCacheManager") FireflyCacheManager cacheManager) {
         this.sessionAggregationService = sessionAggregationService;
         this.cacheManager = cacheManager;

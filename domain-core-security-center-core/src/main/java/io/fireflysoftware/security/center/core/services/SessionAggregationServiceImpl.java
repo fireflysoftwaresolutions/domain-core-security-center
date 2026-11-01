@@ -30,13 +30,13 @@ import java.util.UUID;
 /**
  * Service that aggregates session context from multiple microservices
  */
-@Service
+@Service("sessionAggregationService")
 @RequiredArgsConstructor
 @Slf4j
-public class SessionAggregationService {
+public class SessionAggregationServiceImpl {
 
-    private final CustomerResolverService customerResolverService;
-    private final ContractResolverService contractResolverService;
+    private final CustomerResolverServiceImpl customerResolverService;
+    private final ContractResolverServiceImpl contractResolverService;
 
     /**
      * Aggregates complete session context for a partyId by fetching data from:

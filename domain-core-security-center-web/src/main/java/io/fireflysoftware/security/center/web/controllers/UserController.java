@@ -19,7 +19,7 @@ package io.fireflysoftware.security.center.web.controllers;
 
 import org.fireflyframework.security.idp.dtos.CreateUserRequest;
 import org.fireflyframework.security.idp.dtos.CreateUserResponse;
-import io.fireflysoftware.security.center.core.services.UserService;
+import io.fireflysoftware.security.center.core.services.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +38,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     /**
      * Handles the creation of a new user.
