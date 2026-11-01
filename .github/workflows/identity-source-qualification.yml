@@ -27,6 +27,8 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
+      - name: Verify generation evidence parser controls
+        run: python3 -B -m unittest discover -s tooling -p 'test_verify_generated_receiver.py' -v
       - name: Prepare exact source-parent fixture
         run: python3 tooling/prepare_source_fixture.py
       - name: Run genuine reactor verification in the isolated fixture
@@ -35,6 +37,9 @@ jobs:
           task_maven_status=0
           mvn -B -ntp -Dmaven.repo.local="$RUNNER_TEMP/security-center-source-m2" verify > .qualification/maven.log 2>&1 || task_maven_status=$?
           python3 tooling/summarize_source_fixture.py "$task_maven_status"
+          if [ "$task_maven_status" -eq 0 ]; then
+            python3 tooling/verify_generated_receiver.py
+          fi
           exit "$task_maven_status"
       - name: Preserve source qualification summary
         if: always()
@@ -43,4 +48,19 @@ jobs:
           name: source-parent-23-summary
           path: .qualification/source-summary.json
           if-no-files-found: ignore
+          retention-days: 14
+      - name: Preserve original producer and generated SDK evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: original-receiver-generated-sdk
+          path: |
+            .qualification/receiver-sdk-summary.json
+            domain-core-security-center-web/target/receiver-openapi.json
+            domain-core-security-center-web/target/surefire-reports/TEST-*ReceiverOpenApiContractTest.xml
+            domain-core-security-center-sdk/src/main/resources/openapi.yml
+            domain-core-security-center-sdk/target/generated-sources/src/gen/java/main/
+            domain-core-security-center-sdk/target/domain-core-security-center-sdk-*.jar
+            domain-core-security-center-sdk/target/surefire-reports/TEST-*GeneratedReceiverBearerContractTest.xml
+          if-no-files-found: error
           retention-days: 14

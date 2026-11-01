@@ -22,6 +22,8 @@ import io.fireflysoftware.security.center.session.AccessPort;
 import io.fireflysoftware.security.center.core.authorization.ReceiverAuthorization;
 import io.fireflysoftware.security.center.interfaces.access.AccessAction;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -56,6 +58,8 @@ public class AccessController {
     private final ReceiverAuthorization authorization;
 
     /** Caller admission failures use 401/403; an additional configured port can return a restrictive decision. */
+    @ApiResponse(responseCode = "200", description = "Direct self receiver result",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = AccessDecision.class)))
     @PostMapping("/checks")
     public Mono<ResponseEntity<AccessDecision>> decideAccess(@Valid @RequestBody AccessRequest request) {
         if (request.getAction() == AccessAction.ADMINISTER || request.getAction() == AccessAction.IMPERSONATE) {

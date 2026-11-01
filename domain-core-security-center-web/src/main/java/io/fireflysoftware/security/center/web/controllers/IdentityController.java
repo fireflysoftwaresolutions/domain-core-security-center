@@ -20,7 +20,10 @@ import io.fireflysoftware.security.center.interfaces.identity.IdentityRequest;
 import io.fireflysoftware.security.center.interfaces.identity.Subject;
 import io.fireflysoftware.security.center.core.authorization.ReceiverAuthorization;
 import io.fireflysoftware.security.center.interfaces.identity.IdentityAdapter;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.Map;
@@ -50,7 +53,12 @@ public class IdentityController {
     }
 
     /** Returns only verified self identity; username/password bodies are unsupported. */
+    @ApiResponse(responseCode = "200", description = "Direct self receiver result",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Subject.class)))
     @PostMapping("/subjects")
+    @Operation(operationId = "resolveSubject", summary = "Resolve the independently verified self actor",
+            description = "Requires the direct receiver bearer identity and current policy admission. "
+                    + "An optional actor selector must identify that same actor. Username and password bodies are unsupported.")
     public Mono<ResponseEntity<Subject>> subject(@RequestBody IdentityRequest request) {
         if (request == null || !isBlank(request.getUsername()) || !isBlank(request.getPassword())) {
             return Mono.just(ResponseEntity.badRequest().build());
