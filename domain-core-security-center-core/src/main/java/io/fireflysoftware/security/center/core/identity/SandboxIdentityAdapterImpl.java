@@ -29,7 +29,7 @@ import java.util.Locale;
  * Identity adapter for the OpenPlatform sample. It does not call Keycloak,
  * Cognito, or any other identity provider, and it does not read a password.
  */
-public final class SandboxIdentityAdapter implements IdentityPort {
+public final class SandboxIdentityAdapterImpl implements IdentityPort {
 
     public static final String SAMPLE_USERNAME = "sample-journey";
     public static final String DENIED_USERNAME = "denied-actor";

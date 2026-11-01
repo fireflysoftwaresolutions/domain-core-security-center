@@ -33,10 +33,10 @@ import java.util.UUID;
  * <p>Uses the OpenAPI-generated PartiesApi client to fetch party information
  * and maps the SDK models to Security Center DTOs.
  */
-@Service
+@Service("customerResolverService")
 @RequiredArgsConstructor
 @Slf4j
-public class CustomerResolverService {
+public class CustomerResolverServiceImpl {
 
     private final PartiesApi partiesApi;
     private final NaturalPersonsApi naturalPersonsApi;

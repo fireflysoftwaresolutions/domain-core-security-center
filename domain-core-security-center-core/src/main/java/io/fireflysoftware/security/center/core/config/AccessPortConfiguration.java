@@ -16,9 +16,9 @@
 
 package io.fireflysoftware.security.center.core.config;
 
-import io.fireflysoftware.security.center.core.access.SandboxPolicyAccessAdapter;
-import io.fireflysoftware.security.center.core.access.SessionGrantAccessAdapter;
-import io.fireflysoftware.security.center.core.access.SubjectBoundAccessAdapter;
+import io.fireflysoftware.security.center.core.access.SandboxPolicyAccessAdapterImpl;
+import io.fireflysoftware.security.center.core.access.SessionGrantAccessAdapterImpl;
+import io.fireflysoftware.security.center.core.access.SubjectBoundAccessAdapterImpl;
 import io.fireflysoftware.security.center.session.AccessPort;
 import io.fireflysoftware.security.center.session.FireflySessionManager;
 import io.fireflysoftware.security.center.session.IdentityPort;
@@ -41,7 +41,7 @@ public class AccessPortConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "firefly.security-center.access", name = "adapter", havingValue = "session-grants")
     public AccessPort sessionGrantAccessPort(IdentityPort identityPort, FireflySessionManager sessionManager) {
-        return new SubjectBoundAccessAdapter(identityPort, new SessionGrantAccessAdapter(sessionManager));
+        return new SubjectBoundAccessAdapterImpl(identityPort, new SessionGrantAccessAdapterImpl(sessionManager));
     }
 
     @Bean
@@ -53,8 +53,8 @@ public class AccessPortConfiguration {
     public AccessPort sandboxAccessPort(
             IdentityPort identityPort,
             ResourceLoader resourceLoader,
-            @Value("${firefly.security-center.access.sandbox-policy:" + SandboxPolicyAccessAdapter.DEFAULT_LOCATION + "}")
+            @Value("${firefly.security-center.access.sandbox-policy:" + SandboxPolicyAccessAdapterImpl.DEFAULT_LOCATION + "}")
             String location) {
-        return new SubjectBoundAccessAdapter(identityPort, new SandboxPolicyAccessAdapter(resourceLoader, location));
+        return new SubjectBoundAccessAdapterImpl(identityPort, new SandboxPolicyAccessAdapterImpl(resourceLoader, location));
     }
 }

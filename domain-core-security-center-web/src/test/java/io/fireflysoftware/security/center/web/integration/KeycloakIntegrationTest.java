@@ -135,7 +135,7 @@ class KeycloakIntegrationTest extends AbstractSecurityCenterIntegrationTest {
         when(partiesApi.getPartyById(any(UUID.class), any()))
                 .thenReturn(Mono.just(mockParty));
 
-        // Mock partiesApi.filterParties() for DefaultUserMappingService
+        // Mock partiesApi.filterParties() for DefaultUserMappingServiceImpl
         io.fireflysoftware.core.customer.sdk.model.PaginationResponsePartyDTO partiesResponse =
                 new io.fireflysoftware.core.customer.sdk.model.PaginationResponsePartyDTO();
         partiesResponse.setContent(Collections.singletonList(mockParty));

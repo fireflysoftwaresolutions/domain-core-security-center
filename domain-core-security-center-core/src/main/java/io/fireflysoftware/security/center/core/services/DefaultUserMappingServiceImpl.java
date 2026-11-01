@@ -52,16 +52,16 @@ import java.util.UUID;
  *   <li>Adding a dedicated email search endpoint in customer-mgmt</li>
  *   <li>Storing IDP subject ID in party's sourceSystem field (format: "idp:username")</li>
  *   <li>Implementing caching for email-to-partyId mappings</li>
- *   <li>Providing your own optimized {@code @Service} implementation of {@link UserMappingService}</li>
+ *   <li>Providing your own optimized {@code @Service("defaultUserMappingService")} implementation of {@link UserMappingService}</li>
  * </ul>
  *
  * <p><strong>To auto-provision parties:</strong> Override this service with a custom implementation
  * that creates parties in customer-mgmt when they don't exist.
  */
-@Service
+@Service("defaultUserMappingService")
 @RequiredArgsConstructor
 @Slf4j
-public class DefaultUserMappingService implements UserMappingService {
+public class DefaultUserMappingServiceImpl implements UserMappingService {
 
     private final PartiesApi partiesApi;
     private final EmailContactsApi emailContactsApi;

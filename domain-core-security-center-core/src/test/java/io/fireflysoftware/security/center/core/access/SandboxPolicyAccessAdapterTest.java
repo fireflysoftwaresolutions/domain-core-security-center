@@ -51,11 +51,11 @@ class SandboxPolicyAccessAdapterTest {
             AccessResourceType.PRODUCT, "10000000-0000-4000-8000-000000000008",
             AccessResourceType.PAYMENT, "10000000-0000-4000-8000-0000000000a1");
 
-    static SandboxPolicyAccessAdapter shipped;
+    static SandboxPolicyAccessAdapterImpl shipped;
 
     @BeforeAll
     static void loadShippedPolicy() {
-        shipped = new SandboxPolicyAccessAdapter(new DefaultResourceLoader(), SandboxPolicyAccessAdapter.DEFAULT_LOCATION);
+        shipped = new SandboxPolicyAccessAdapterImpl(new DefaultResourceLoader(), SandboxPolicyAccessAdapterImpl.DEFAULT_LOCATION);
     }
 
     @ParameterizedTest
@@ -198,7 +198,7 @@ class SandboxPolicyAccessAdapterTest {
                 }
                 """);
 
-        SandboxPolicyAccessAdapter replaced = new SandboxPolicyAccessAdapter(
+        SandboxPolicyAccessAdapterImpl replaced = new SandboxPolicyAccessAdapterImpl(
                 new DefaultResourceLoader(), file.toUri().toString());
 
         assertDecision(
@@ -229,7 +229,7 @@ class SandboxPolicyAccessAdapterTest {
                 }
                 """);
 
-        SandboxPolicyAccessAdapter replaced = new SandboxPolicyAccessAdapter(
+        SandboxPolicyAccessAdapterImpl replaced = new SandboxPolicyAccessAdapterImpl(
                 new DefaultResourceLoader(), file.toUri().toString());
 
         assertDecision(
@@ -246,7 +246,7 @@ class SandboxPolicyAccessAdapterTest {
 
     @Test
     void missingPolicyFileFailsAtStartup() {
-        assertThatThrownBy(() -> new SandboxPolicyAccessAdapter(
+        assertThatThrownBy(() -> new SandboxPolicyAccessAdapterImpl(
                 new DefaultResourceLoader(), "classpath:access/missing-sandbox-access-policy.json"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("not found");
@@ -257,13 +257,13 @@ class SandboxPolicyAccessAdapterTest {
         Path file = Files.createTempFile("sandbox-access-policy", ".json");
         Files.writeString(file, "{");
 
-        assertThatThrownBy(() -> new SandboxPolicyAccessAdapter(new DefaultResourceLoader(), file.toUri().toString()))
+        assertThatThrownBy(() -> new SandboxPolicyAccessAdapterImpl(new DefaultResourceLoader(), file.toUri().toString()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("could not be read");
     }
 
     private static void assertDecision(
-            SandboxPolicyAccessAdapter adapter,
+            SandboxPolicyAccessAdapterImpl adapter,
             AccessRequest request,
             boolean allowed,
             String reasonCode) {

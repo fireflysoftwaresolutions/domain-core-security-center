@@ -18,7 +18,7 @@ package io.fireflysoftware.security.center.web.config;
 
 import io.fireflysoftware.core.customer.sdk.api.EmailContactsApi;
 import io.fireflysoftware.core.customer.sdk.api.PartiesApi;
-import io.fireflysoftware.security.center.core.services.DefaultUserMappingService;
+import io.fireflysoftware.security.center.core.services.DefaultUserMappingServiceImpl;
 import io.fireflysoftware.security.center.core.services.UserMappingService;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -27,20 +27,20 @@ import org.springframework.context.annotation.Primary;
 /**
  * Test configuration for Security Center integration tests.
  *
- * <p>This configuration ensures that {@link DefaultUserMappingService} is created
+ * <p>This configuration ensures that {@link DefaultUserMappingServiceImpl} is created
  * in the test context using the mocked SDK APIs.
  */
 @TestConfiguration
 public class SecurityCenterTestConfiguration {
 
     /**
-     * Create DefaultUserMappingService bean for tests.
+     * Create DefaultUserMappingServiceImpl bean for tests.
      * This bean will use the mocked PartiesApi and EmailContactsApi from the test context.
      */
     @Bean
     @Primary
     public UserMappingService userMappingService(PartiesApi partiesApi, EmailContactsApi emailContactsApi) {
-        return new DefaultUserMappingService(partiesApi, emailContactsApi);
+        return new DefaultUserMappingServiceImpl(partiesApi, emailContactsApi);
     }
 }
 
